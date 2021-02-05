@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/Adambear1/localStorageAdaptivePattern#readme",
   "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
     "nodemon": "^2.0.7"
   }
 }

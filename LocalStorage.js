@@ -1,18 +1,15 @@
-const { writeFile, readFile, existsSync } = require("fs");
+const { writeFile, readFileSync, existsSync } = require("fs");
 const Logger = require("./Logger");
 const { log } = new Logger();
 class LocalStorage {
   constructor() {
-    this.fileName = "localStorage.json";
-    if (existsSync(this.fileName)) {
-      log("success", "Retrieving local storage items");
-      var text = readFile(this.fileName);
-      this.items = text;
+    if (existsSync("localStorage.json")) {
+      this.items = JSON.parse(readFileSync("localStorage.json"));
     } else {
-      log("success", "No items in local storage");
       this.items = {};
     }
   }
+
   get length() {
     return Object.keys(this.items).length;
   }
@@ -22,18 +19,13 @@ class LocalStorage {
   getItem(key) {
     return this.items[key];
   }
-
   setItem(key, value) {
-    this.items = this.items[key] = value;
-    return writeFile(
-      "localStorage.json",
-      JSON.stringify(this.items),
-      ({ message }) => {
-        if (message) {
-          log(null, message);
-        }
+    this.items[key] = value;
+    writeFile("localStorage.json", JSON.stringify(this.items), (error) => {
+      if (error) {
+        console.error(error);
       }
-    );
+    });
   }
 
   clear() {
@@ -48,4 +40,4 @@ class LocalStorage {
   }
 }
 
-module.exports = LocalStorage;
+module.exports = new LocalStorage();

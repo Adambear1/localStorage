@@ -1,18 +1,23 @@
 const app = require("express")();
 const path = require("path");
+const cors = require("cors");
+const bodyParser = require("body-parser");
 const Logger = require("./Logger");
-const LocalStorage = require("./LocalStorage");
+const localStorage = require("./LocalStorage");
+// Instances
 const { log } = new Logger();
-const { getItem, setItem, getAll, clear } = new LocalStorage();
+// Middle Ware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors());
 // Local Storage
-app.post("/api/:action", ({ params, body }, res) => {
+app.post("/api/:action", ({ body, params }, res) => {
   const { action } = params;
   const { key, value } = body;
-  console.log(action);
   switch (action) {
     case "add":
-      setItem(key, value);
-      getAll();
+      localStorage.setItem(key, value);
+      localStorage.getAll();
       break;
     case "remove":
       break;
@@ -26,7 +31,7 @@ app.post("/api/:action", ({ params, body }, res) => {
 // Send HTML File
 app.get("*", (req, res) => {
   try {
-    res.sendFile(path.join(__dirname, "./index.html"));
+    res.sendFile(path.join(__dirname, "./public/index.html"));
   } catch ({ message }) {
     log(null, message);
   }

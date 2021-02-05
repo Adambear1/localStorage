@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="text" id="title" placeholder="Title" />
+    <input type="text" id="message" placeholder="Message" />
+    <button id="add">Add</button>
+    <button id="clear">Clear</button>
+  </body>
+  <script>
+    (function () {
+      document.addEventListener("DOMContentLoaded", () => {
+        try {
+          fetch("/api", { method: "GET" })
+            .then((response) => response.json())
+            .then((data) => {
+              console.log("Success:", data);
+            });
+        } catch ({ message }) {
+          console.log(message);
+        }
+      });
+    })();
+    var title = document.querySelector("#title");
+    var message = document.querySelector("#message");
+    var add = document.querySelector("#add");
+    add.addEventListener("click", async (e) => {
+      var send = await fetch("/api/add", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          key: title.value,
+          value: message.value,
+        }),
+      });
+    });
+  </script>
+</html>
