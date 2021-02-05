@@ -30,11 +30,9 @@ class LocalStorage {
 
   clear() {
     this.items = {};
-    unlink("localStorage.json", () => {
-      try {
-        log("success", "Local Storage Cleared");
-      } catch ({ message }) {
-        log(null, message);
+    writeFile("localStorage.json", JSON.stringify(this.items), (error) => {
+      if (error) {
+        console.error(error);
       }
     });
   }
