@@ -10,6 +10,8 @@
     <input type="text" id="message" placeholder="Message" />
     <button id="add">Add</button>
     <button id="clear">Clear</button>
+    <button id="filter">Filter</button>
+
     <ul id="list"></ul>
   </body>
   <script>
@@ -18,50 +20,90 @@
     var add = document.querySelector("#add");
     var clear = document.querySelector("#clear");
     var list = document.querySelector("#list");
-    var remove = "<button type='btn' id='remove'>🗑️</button>";
+    var filter = document.querySelector("#filter")
+
 
     const update = (obj) => {
+      var removeBtn = "<button type='btn' id='remove' onclick='removeItem(event)'>Remove</button>"
+      var editBtn = "<button type='btn' id='remove' onclick='editItem(event)'>Edit</button>"
       try {
-        for (var child of list.childNodes) {
-          console.log(child);
-          child.remove();
-        }
+        window.localStorage.clear();
+        list.innerHTML = ""
         for (var item in obj) {
+          // LocalStorage
+          window.localStorage.setItem(JSON.stringify(item), JSON.stringify(obj[item]))
+          // DOM
           var li = document.createElement("li");
           var title = item;
           var message = obj[item];
           li.setAttribute("id", item);
           li.innerHTML +=
-            "<p><b>" + title + ":</b>  " + message + "</p>" + "   " + remove;
+            "<p><b id='key'>" + title + ":</b>  " + "<p id='value'>" + message + "</p></p>" + "   " + removeBtn +  "    " + editBtn;
           list.append(li);
         }
       } catch ({ message }) {
         console.error(message);
       }
     };
-    const apiRequest = async (route = "", method = "POST") => {
-      var send = await fetch("/api/" + route, {
+    const apiRequest = async (route = "", id = null, body = null, method = "POST") => {
+      var apiRoute = id ? "/api/" + route + "/" + id : "/api/" + route
+      var send = await fetch(apiRoute, {
         method,
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
         body:
-          title.value || message.value
-            ? JSON.stringify({
+          title.value || message.value || id
+            ? ( body ? JSON.stringify(body) : JSON.stringify({
                 key: title.value,
                 value: message.value,
-              })
-            : "",
+              }))
+            : ""
       })
         .then((response) => response.json())
         .then((data) => {
           update(data);
         });
     };
+
     add.addEventListener("click", () => apiRequest("add"));
     clear.addEventListener("click", () => apiRequest("clear"));
+    filter.addEventListener("click", () => apiRequest("filter"))
+    function removeItem({target}){
+      var {parentNode} = target;
+      apiRequest("remove", parentNode.id)
+    }
+    function editItem({target}){
+      if(target){
+      // Variables
+      var {parentNode} = target;
+      var key = parentNode.querySelector("#key")
+      var value = parentNode.querySelector("#value")
+      // Change btn
+      target.removeAttribute("onclick") 
+      target.setAttribute("onclick", "confirmEdit(event)")
+      target.innerText = "Confirm Change";
+      // Change HTML
+      key.innerHTML = `<input id='newKey' value='${key.innerText.substring(0, key.innerText.length-1)}'>`
+      value.innerHTML = `<input id='newValue' value='${value.innerText.substring(0, value.innerText.length-1)}'>`
+      // 
+      }
+    }
+    function confirmEdit({target}){
+      if(target){
+      var {parentNode} = target
+      var newKey = parentNode.querySelector("#newKey")
+      var newValue = parentNode.querySelector("#newValue")
+      console.log(parentNode.id)
+      console.log(newKey.value)
+      console.log(newValue.value)
+      apiRequest("edit", parentNode.id, {key: newKey.value, value: newValue.value })
+      }
+    }
+    document.addEventListener("DOMContentLoaded", function(){
+      apiRequest();
+    })
 
-    apiRequest();
   </script>
 </html>

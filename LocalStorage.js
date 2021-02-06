@@ -16,16 +16,28 @@ class LocalStorage {
   getAll() {
     return this.items;
   }
-  getItem(key) {
-    return this.items[key];
+  removeOne(key){
+    delete this.items[key]
+    writeFile("localStorage.json", JSON.stringify(this.items), (error) => {
+      if (error) {
+        console.error(error);
+      }
+    })
+    return this.items
   }
-  setItem(key, value) {
+
+  editItem(key, value){
+    return this.items[key] = value
+  }
+  setItem(key, value, id) {
+    delete this.items[id]
     this.items[key] = value;
     writeFile("localStorage.json", JSON.stringify(this.items), (error) => {
       if (error) {
         console.error(error);
       }
     });
+    return this.items
   }
 
   clear() {
@@ -35,6 +47,7 @@ class LocalStorage {
         console.error(error);
       }
     });
+    return this.items
   }
 }
 
