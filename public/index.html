@@ -17,35 +17,51 @@
     var message = document.querySelector("#message");
     var add = document.querySelector("#add");
     var clear = document.querySelector("#clear");
+    var list = document.querySelector("#list");
+    var remove = "<button type='btn' id='remove'>🗑️</button>";
+
     const update = (obj) => {
       try {
+        for (var child of list.childNodes) {
+          console.log(child);
+          child.remove();
+        }
         for (var item in obj) {
           var li = document.createElement("li");
           var title = item;
           var message = obj[item];
-          li.innerHTML += "<p><b>" + title + ":</b>  " + message + "</p>";
-          document.querySelector("#list").append(li);
+          li.setAttribute("id", item);
+          li.innerHTML +=
+            "<p><b>" + title + ":</b>  " + message + "</p>" + "   " + remove;
+          list.append(li);
         }
       } catch ({ message }) {
         console.error(message);
       }
     };
-    const apiRequest = async (route = "", method = "GET") => {
+    const apiRequest = async (route = "", method = "POST") => {
       var send = await fetch("/api/" + route, {
-        method: method,
+        method,
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          key: title.value,
-          value: message.value,
-        }),
+        body:
+          title.value || message.value
+            ? JSON.stringify({
+                key: title.value,
+                value: message.value,
+              })
+            : "",
       })
         .then((response) => response.json())
-        .then((data) => update(data));
+        .then((data) => {
+          update(data);
+        });
     };
-    add.addEventListener("click", () => apiRequest("add", "POST"));
-    clear.addEventListener("click", () => apiRequest("clear", "POST"));
+    add.addEventListener("click", () => apiRequest("add"));
+    clear.addEventListener("click", () => apiRequest("clear"));
+
+    apiRequest();
   </script>
 </html>

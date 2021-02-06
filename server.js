@@ -11,22 +11,22 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 // Local Storage
-app.get("/api/", (req, res) => {
-  return res.json(localStorage.getAll());
-});
-app.post("/api/:action", ({ body, params }, res) => {
+app.post("/api/:action?", ({ body, params }, res) => {
   const { action } = params;
   const { key, value } = body;
-  console.log(action);
-  switch (action) {
-    case "add":
-      localStorage.setItem(key, value);
-      return res.json(localStorage.getAll());
-    case "clear":
-      localStorage.clear();
-      return res.json(localStorage.getAll());
-    default:
-      break;
+  if (!action) {
+    return res.json(localStorage.getAll());
+  } else {
+    switch (action) {
+      case "add":
+        localStorage.setItem(key, value);
+        return res.json(localStorage.getAll());
+      case "clear":
+        localStorage.clear();
+        return res.json(localStorage.getAll());
+      default:
+        break;
+    }
   }
 });
 // Send HTML File
