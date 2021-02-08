@@ -1,3 +1,6 @@
+## Example
+!["Demo"](./media/localStorage.gif)
+
 ## Features
 * utilizes ES2015, with no third party libraries (outside of cors and express).
 * uses factory & addaptive design pattern on server.
@@ -9,3 +12,4 @@
 ## Future additions
 * replace cors & express dependencies with http & url built in features
 * create custom search bar to filter via key/values.
+
